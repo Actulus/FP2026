@@ -1,4 +1,5 @@
 import Data.Foldable
+import Data.Ord
 
 -- # 5. labor
 
@@ -61,14 +62,65 @@ all2 fg (x : ls)
 -- II. Írjunk Haskell-függvényt, amely a foldl vagy a foldr függvényt alkalmazva
 
 -- - implementálja a length, sum, elem, reverse, product, maximum, insert-sort, ++, map, filter függvényeket,
+length' ls = foldl (\res x -> res + 1) 0 ls
+
+sum' ls = foldl (+) 0 ls
+
+sum2 ls = foldl1 (+) ls
+
+reverse' ls = foldl (\res x -> x : res) [] ls
+
+reverse2 ls = foldr (\x res -> res ++ [x]) [] ls
+
+product' ls = foldl (*) 1 ls
+
+product2 ls = foldl1 (*) ls
+
+maximum' ls = foldl1 (\x1 x2 -> if x1 > x2 then x1 else x2) ls
+
+maximum2 ls = foldl1 (max) ls
+
+insertSort ls = foldr insert [] ls
+  where
+    insert x [] = [x]
+    insert x (y : ys)
+      | x <= y = x : y : ys
+      | otherwise = y : insert x ys
+
+lsFuz lss = foldl1 (++) lss
+
+map' fg ls = foldl (\res x -> res ++ [fg x]) [] ls
+
+filter' fg ls = foldl (\res x -> if fg x then res ++ [x] else res) [] ls
+
 -- - meghatározza egy lista pozitív elemeinek összegét,
+pozitivOsszead ls = foldl (\res x1 -> if x1 >= 0 then res + x1 else res) 0 ls
+
 -- - egy lista páros elemeinek szorzatát,
+parosSzorzat ls = foldl (\res x1 -> if even x1 then res * x1 else res) 1 ls
+
+-- parosSzorzat2 ls = foldl1 (\res x1 -> if even x1 then res * x1 else res) ls
+
 -- - n-ig a négyzetszámokat.
+negyzet n = foldl (\res x1 -> if x1 ^ 2 <= n then res ++ [x1 ^ 2] else res) [] [0 .. n]
+
 -- - meghatározza a $$P(x) = a_0 + a_1 x + a_2 x^2 + \ldots + a_n x^n$$ polinom adott $x_0$ értékre való behelyettesítési értékét: $$a_0 + x_0(a_1 + x_0(a_2 + x_0(a_3 + \ldots + x_0(a_{n-1}+ x_0 \cdot a_n))))$$
+poli aLs x = foldr (\a res -> a + (x * res)) 0 aLs
 
 -- III.
 
 -- - Írjunk egy Haskell-függvényt, amely egy String típusú listából meghatározza azokat a szavakat, amelyek karakterszáma a legkisebb. Például ha a lista a következő szavakat tartalmazza:  function class Float higher-order monad tuple variable Maybe recursion  akkor az eredmény-lista a következőkből áll: class Float monad tuple Maybe
+lsSzavak = ["function", "class", "Float", "higher-order", "monad", "tuple", "variable", "Maybe", "recursion"]
+
+legrovidebbSzavak = filter (\x -> length x == minHossz) lsSzavak
+  where
+    minHossz = length $ minimumBy (comparing length) lsSzavak
+
+legrovidebbSzavak2 ls = filter (\x -> length x == minHossz) ls
+  where
+    szavakHossza = map length ls
+    minHossz = minimum szavakHossza
+
 -- - Írjunk egy talalat Haskell-függvényt, amely meghatározza azt a listát, amely a bemeneti listában megkeresi egy megadott elem előfordulási pozícióit.
 --   Például a következő függvényhívások esetében az első az 5-ös előfordulási pozícióit, míg a második az e előfordulási pozícióinak listáját határozza meg.
 
@@ -78,6 +130,8 @@ all2 fg (x : ls)
 --   > talalat 'e' "Bigeri-vizeses"
 --   [3,10,12]
 --   ```
+talalat n ls = [idx | (idx, i) <- zip [0 ..] ls, i == n]
+
 -- - Írjunk egy osszegT Haskell-függvényt, amely meghatározza egy (String, Int)értékpárokból álló lista esetében az értékpárok második elemeiből képzett összeget.
 --   Például:
 
@@ -86,6 +140,10 @@ all2 fg (x : ls)
 --   > osszegT ls
 --   337
 --   ```
+osszegT ls = foldl (\res (szo, szam) -> res + szam) 0 ls
+
+osszegT2 ls = sum $ map snd ls
+
 -- - Írjunk egy atlagTu Haskell-függvényt, amely egy kételemű, tuple elemtípusú lista esetében átlagértékeket számol a második elem szerepét betöltő listaelemeken. Az eredmény egy tuple elemtípusú lista legyen, amelynek kiíratása során a tuple-elemeket formázzuk, és külön sorba írjuk őket.
 --   Például:
 
@@ -99,3 +157,14 @@ all2 fg (x : ls)
 --   zsuzsa 7.466666666666666
 --   levi 8.875
 --   ```
+
+nevsor = [("mari", [10, 6, 5.5, 8]), ("feri", [8.5, 9.5]), ("zsuzsa", [4.5, 7.9, 10]), ("levi", [8.5, 9.5, 10, 7.5])]
+
+atlagTu ls = mapM_ (\(nev, jegyekLs) -> putStrLn (nev ++ " " ++ show (atlag jegyekLs))) ls
+  where
+    atlag ls = sum ls / fromIntegral (length ls)
+
+atlagTu2 ls = mapM_ (\(nev, jegyekAtlag) -> putStrLn (nev ++ " " ++ show jegyekAtlag)) ls2
+  where
+    ls2 = [(nev, atlag jegyek) | (nev, jegyek) <- ls]
+    atlag ls = sum ls / fromIntegral (length ls)
