@@ -308,3 +308,17 @@ fel6 = do
     then putStrLn "Nincs paratlan elofordulasi ertekkel rendelkezo szam."
     else
       mapM_ (\(szam, elof) -> putStrLn ("Elofordulas: " ++ show elof ++ " -> Ertek: " ++ show szam)) megoldas
+
+main = do
+  putStrLn "fel1"
+  fel1
+  putStrLn "\nfel2"
+  fel2
+  putStrLn "\nfel3"
+  fel3
+  putStrLn "\nfel4"
+  fel4
+  putStrLn "\nfel5"
+  fel5
+  putStrLn "\nfel6"
+  fel6
